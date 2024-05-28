@@ -1,23 +1,31 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { StatusBar } from "expo-status-bar"
 import moment from "moment"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FlatList, StyleSheet, View } from "react-native"
+import api from "../api"
 import Header from "../components/Header"
 import IconButton from "../components/IconButton"
 import InfoItem from "../components/InfoItem"
 import Screen from "../components/Screen"
 import Tab from "../components/Tab"
 import TaskCard from "../components/TaskCard"
+import { useAuth } from "../hooks/use-auth"
 import { RootStackParamList } from "../navigation"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">
 
 const Home = ({ navigation }: Props) => {
-	const [tab, setTab] = useState("pending")
+	const [tab, setTab] = useState("scheduled")
+	const [userData, setUserData] = useState<any>(null)
+	const [activities, setActivities] = useState([])
+	const [refreshing, setRefreshing] = useState(false)
+
+	const auth = useAuth()
 
 	const tabs = [
-		{ label: "pending", labelValue: 1 },
+		{ label: "scheduled", labelValue: 1 },
 		{ label: "completed", labelValue: 0 },
 	]
 
@@ -27,11 +35,45 @@ const Home = ({ navigation }: Props) => {
 
 		if (hour >= 5 && hour < 12) {
 			return "Good Morning"
-		} else if (hour >= 12 && hour < 18) {
+		} else if (hour >= 12 && hour < 17) {
 			return "Good Afternoon"
 		} else {
 			return "Good Evening"
 		}
+	}
+
+	const handleLogout = () => {
+		auth.logout()
+	}
+
+	useEffect(() => {
+		getUserData()
+	}, [])
+
+	const getUserData = async () => {
+		try {
+			const userData = await AsyncStorage.getItem("cookieman")
+			setUserData(userData ? JSON.parse(userData) : null)
+		} catch (e) {
+			console.error("Error parsing JSON", e)
+			return null
+		}
+	}
+
+	useEffect(() => {
+		handleFetchActivities()
+	}, [])
+
+	const handleFetchActivities = () => {
+		setRefreshing(true)
+		api.maintenance
+			.getByTechnicianId(userData?.id)
+			.then((response) => {
+				setActivities(response.data)
+			})
+			.finally(() => {
+				setRefreshing(false)
+			})
 	}
 
 	return (
@@ -50,7 +92,7 @@ const Home = ({ navigation }: Props) => {
 				/>
 				<IconButton
 					icon="log-out"
-					onPress={() => navigation.navigate("Login")}
+					onPress={handleLogout}
 					type="dark"
 					// hasAlert
 				/>
@@ -71,29 +113,11 @@ const Home = ({ navigation }: Props) => {
 				/>
 			</View>
 
-			{tab === "pending" && (
+			{tab === "scheduled" && (
 				<FlatList
-					data={[
-						{
-							id: 1,
-							activity_type: "maintenance",
-							activity_description: "Routine maintenance check",
-							aircraft_id: 1,
-							technician_id: "technician1",
-							start_datetime: "2024-05-10T06:00:00.000Z",
-							end_datetime: "2024-05-10T10:00:00.000Z",
-							parts_replaced: ["part1", "part2"],
-							issues_resolved: "No issues found",
-							status: "completed",
-							created_at: "2024-05-10T18:36:52.000Z",
-							updated_at: "2024-05-10T18:43:49.000Z",
-							aircraft_manufacturer: "Boeing",
-							aircraft_model: "737",
-							registration_number: "ABC122",
-							technician_name: "james jr. cameron",
-							technician_email: "jamescameron@aero.pro",
-						},
-					]}
+					refreshing={refreshing}
+					onRefresh={handleFetchActivities}
+					data={activities}
 					contentContainerStyle={{ paddingVertical: 20 }}
 					keyExtractor={(item) => JSON.stringify(item)}
 					renderItem={({ item }) => {

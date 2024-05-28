@@ -3,6 +3,7 @@ export interface Maintenance {
 	activity_type: string
 	activity_description: string
 	aircraft_id: number
+	priority: number
 	technician_id: string
 	start_datetime: string
 	end_datetime: string

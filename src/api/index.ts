@@ -1,0 +1,65 @@
+import axios from "axios"
+
+export const API_BASE_URL = "http://192.168.0.127:8080" // Adjust the base URL as needed
+
+const api = {
+	auth: {
+		login: (payload: { password: string; email: string }) =>
+			axios.post(`${API_BASE_URL}/auth/login`, payload),
+		updatePassword: (payload: { id: number; currentPassword: string; newPassword: string }) =>
+			axios.put(`${API_BASE_URL}/auth/update-password`, payload),
+	},
+
+	user: {
+		getOne: (id: number) => axios.get(`${API_BASE_URL}/user/${id}`),
+	},
+
+	// aircraft: {
+	// 	post: (payload) => axios.post(`${API_BASE_URL}/aircraft`, payload),
+	// 	get: () => axios.get(`${API_BASE_URL}/aircraft/`),
+	// 	getOne: (id) => axios.get(`${API_BASE_URL}/aircraft/${id}`),
+	// 	put: (payload, id) => axios.put(`${API_BASE_URL}/aircraft/${id}`, payload),
+	// 	delete: (id) => axios.delete(`${API_BASE_URL}/aircraft/${id}`),
+	// },
+
+	// document: {
+	// 	post: (payload) => axios.post(`${API_BASE_URL}/document`, payload),
+	// 	get: () => axios.get(`${API_BASE_URL}/document/`),
+	// 	getOne: (id) => axios.get(`${API_BASE_URL}/document/${id}`),
+	// 	put: (payload, id) => axios.put(`${API_BASE_URL}/document/${id}`, payload),
+	// 	delete: (id) => axios.delete(`${API_BASE_URL}/document/${id}`),
+	// },
+
+	// flight: {
+	// 	post: (payload) => axios.post(`${API_BASE_URL}/flight`, payload),
+	// 	get: () => axios.get(`${API_BASE_URL}/flight/`),
+	// 	getOne: (id) => axios.get(`${API_BASE_URL}/flight/${id}`),
+	// 	put: (payload, id) => axios.put(`${API_BASE_URL}/flight/${id}`, payload),
+	// 	delete: (id) => axios.delete(`${API_BASE_URL}/flight/${id}`),
+	// },
+
+	maintenance: {
+		getByTechnicianId: (id: number) =>
+			axios.get(`${API_BASE_URL}/maintenance/technician/${id}`),
+		put: (
+			payload: {
+				activity_type: string
+				activity_description: string
+				aircraft_id: number
+				technician_id: number
+				start_datetime: string
+				end_datetime: string
+				parts_replaced: string
+				issues_resolved: string
+				status: "scheduled" | "in_progress" | "completed"
+			},
+			id: number
+		) => axios.put(`${API_BASE_URL}/maintenance/${id}`, payload),
+	},
+
+	part: {
+		get: () => axios.get(`${API_BASE_URL}/part/`),
+	},
+}
+
+export default api

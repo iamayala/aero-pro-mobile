@@ -26,22 +26,39 @@ const TaskDetail = ({ navigation, route }: Props) => {
 				<IconButton icon="chevron-left" onPress={() => navigation.goBack()} type="light" />
 			</View>
 
-			<View style={{ flexDirection: "row", marginTop: 20, marginBottom: 10 }}>
+			<View style={{ flexDirection: "row", marginTop: 20, marginBottom: 10, gap: 10 }}>
 				<Tag label={task.activity_type} />
-				<View style={{ flex: 1 }} />
+				<Tag
+					label={
+						task.priority === 1
+							? "High Priority"
+							: task.priority === 2
+							? "Medium Priority"
+							: task.priority === 3
+							? "Low Priority"
+							: "No Priority"
+					}
+				/>
 			</View>
 
 			<Header header={task.activity_description} color="#000000" />
 
 			<View style={{ marginBottom: 30 }}>
 				<InfoHolder
+					label="Aircraft Details"
+					header={task.aircraft_manufacturer + " " + task.aircraft_model}
+				/>
+			</View>
+
+			<InfoHolder label="Description" subHeader={task.activity_description} />
+
+			<View style={{ marginTop: 30 }}>
+				<InfoHolder
 					label="Time Left"
 					header={moment(task.start_datetime).fromNow()}
 					subHeader={moment(task.start_datetime).format("dddd, MMM D YYYY h:mm A")}
 				/>
 			</View>
-
-			<InfoHolder label="Additional Description" subHeader={task.activity_description} />
 
 			<View style={{ marginTop: 30 }}>
 				<InfoHolder

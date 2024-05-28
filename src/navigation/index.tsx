@@ -22,6 +22,7 @@ const Navigation = () => {
 				initialRouteName="Login"
 				screenOptions={{
 					headerShown: false,
+					gestureEnabled: false,
 				}}
 			>
 				<Stack.Screen name="Profile" component={Profile} />

@@ -1,9 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { ScrollView, Text, TouchableOpacity, View } from "react-native"
 import IconButton from "../components/IconButton"
 import Screen from "../components/Screen"
 import Tag from "../components/Tag"
+import { useAuth } from "../hooks/use-auth"
 import { RootStackParamList } from "../navigation"
 
 type ProfileComponent = {
@@ -219,6 +221,22 @@ type ProfileComponent = {
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">
 
 const Profile = ({ navigation }: Props) => {
+	const [userData, setUserData] = useState<any>(null)
+
+	useEffect(() => {
+		getUserData()
+	}, [])
+
+	const getUserData = async () => {
+		try {
+			const userData = await AsyncStorage.getItem("cookieman")
+			setUserData(userData ? JSON.parse(userData) : null)
+		} catch (e) {
+			console.error("Error parsing JSON", e)
+			return null
+		}
+	}
+
 	const ProfileComponent = ({ icon, subTitle, title }: ProfileComponent) => {
 		return (
 			<TouchableOpacity
@@ -247,8 +265,8 @@ const Profile = ({ navigation }: Props) => {
 							marginVertical: 15,
 						}}
 					/>
-					<Text style={{ fontSize: 25 }}>James Wilson</Text>
-					<Text style={{ fontSize: 18, marginTop: 5 }}>JamesWilson@gmail.com</Text>
+					<Text style={{ fontSize: 25 }}>{userData?.full_name}</Text>
+					<Text style={{ fontSize: 18, marginTop: 5 }}>{userData?.email}</Text>
 					<View
 						style={{
 							flexDirection: "row",
@@ -257,7 +275,7 @@ const Profile = ({ navigation }: Props) => {
 							justifyContent: "center",
 						}}
 					>
-						<Tag label="Maintenance" />
+						<Tag label={userData?.role} />
 					</View>
 				</View>
 
