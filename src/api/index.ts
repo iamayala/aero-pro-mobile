@@ -1,6 +1,6 @@
 import axios from "axios"
 
-export const API_BASE_URL = "http://192.168.0.127:8080" // Adjust the base URL as needed
+export const API_BASE_URL = "http://192.168.0.106:8080" // Adjust the base URL as needed
 
 const api = {
 	auth: {
@@ -46,12 +46,12 @@ const api = {
 				activity_type: string
 				activity_description: string
 				aircraft_id: number
-				technician_id: number
+				technician_id: any
 				start_datetime: string
 				end_datetime: string
-				parts_replaced: string
+				parts_replaced: any[]
 				issues_resolved: string
-				status: "scheduled" | "in_progress" | "completed"
+				status: string
 			},
 			id: number
 		) => axios.put(`${API_BASE_URL}/maintenance/${id}`, payload),

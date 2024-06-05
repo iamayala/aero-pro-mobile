@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableOpacity } from "react-native"
+import { View, Text, TouchableOpacity, ScrollView } from "react-native"
 
 const Tab = ({
 	active,
@@ -8,16 +8,16 @@ const Tab = ({
 	style,
 }: {
 	active: string
-	onPress: (value: string) => void
-	tabs: { label: string; labelValue: number }[]
+	onPress: (value: any) => void
+	tabs: { label: string; labelValue: string }[]
 	style?: any
 }) => {
 	return (
-		<View
+		<ScrollView
+			horizontal
 			style={[
 				{
 					flexDirection: "row",
-					alignItems: "center",
 					borderBottomColor: "#6F7C94",
 					borderBottomWidth: 1,
 				},
@@ -27,42 +27,21 @@ const Tab = ({
 			{tabs.map((tab, index) => {
 				return (
 					<TouchableOpacity
-						onPress={() => onPress(tab.label)}
+						onPress={() => onPress(tab)}
 						key={index}
 						style={{
 							paddingBottom: 15,
+							paddingHorizontal: 15,
 							flexDirection: "row",
 							alignItems: "center",
 							flex: 1,
 							borderBottomColor: "#FFFFFF",
-							borderBottomWidth: active === tab.label ? 1 : 0,
+							borderBottomWidth: active === tab.labelValue ? 1 : 0,
 						}}
 					>
-						<View
-							style={{
-								backgroundColor: active === tab.label ? "#FFFFFF" : "transparent",
-								height: 30,
-								alignItems: "center",
-								justifyContent: "center",
-								paddingHorizontal: 13,
-								borderRadius: 20,
-								borderColor: "#FFFFFF",
-								borderWidth: active !== tab.label ? 1 : 0,
-							}}
-						>
-							<Text
-								style={{
-									fontSize: 16,
-									color: active === tab.label ? "#000000" : "#FFFFFF",
-								}}
-							>
-								{tab.labelValue}
-							</Text>
-						</View>
 						<Text
 							style={{
-								marginLeft: 13,
-								color: active === tab.label ? "#658DF7" : "#FFFFFF",
+								color: active === tab.labelValue ? "#658DF7" : "#FFFFFF",
 								fontSize: 26,
 								fontWeight: "300",
 								textTransform: "capitalize",
@@ -73,7 +52,7 @@ const Tab = ({
 					</TouchableOpacity>
 				)
 			})}
-		</View>
+		</ScrollView>
 	)
 }
 

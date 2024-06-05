@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import moment from "moment"
 import React from "react"
 import { View } from "react-native"
+import api from "../api"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import IconButton from "../components/IconButton"
@@ -14,6 +15,24 @@ type Props = NativeStackScreenProps<RootStackParamList, "TaskDetail">
 
 const TaskDetail = ({ navigation, route }: Props) => {
 	const { task } = route.params
+
+	const updateTask = () => {
+		const payload = {
+			...task,
+			status: "in_progress",
+		}
+
+		api.maintenance
+			.put(payload, task.id)
+			.then((response) => {
+				if (response.status === 200) {
+					navigation.navigate("Home")
+				}
+			})
+			.catch((error) => {
+				new Error(error.message)
+			})
+	}
 	return (
 		<Screen color="#FDF684" style={{ paddingHorizontal: 25 }}>
 			<View
@@ -69,9 +88,27 @@ const TaskDetail = ({ navigation, route }: Props) => {
 
 			<View style={{ flex: 1 }} />
 
-			<View style={{ marginBottom: 15 }}>
-				<Button label="Mark as Completed" onPress={() => {}} type="light" />
-			</View>
+			{task.status !== "completed" && (
+				<View style={{ marginBottom: 15 }}>
+					<Button
+						label={
+							task.status === "scheduled"
+								? "Start Task"
+								: task.status === "in_progress"
+								? "Finish Task"
+								: ""
+						}
+						onPress={() =>
+							task.status === "scheduled"
+								? updateTask()
+								: task.status === "in_progress"
+								? navigation.navigate("Checkout", { task })
+								: {}
+						}
+						type="light"
+					/>
+				</View>
+			)}
 		</Screen>
 	)
 }

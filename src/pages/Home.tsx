@@ -16,18 +16,19 @@ import { RootStackParamList } from "../navigation"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">
 
+const tabs = [
+	{ label: "scheduled", labelValue: "scheduled" },
+	{ label: "in progress", labelValue: "in_progress" },
+	{ label: "completed", labelValue: "completed" },
+]
+
 const Home = ({ navigation }: Props) => {
-	const [tab, setTab] = useState("scheduled")
+	const [tab, setTab] = useState(tabs[0])
 	const [userData, setUserData] = useState<any>(null)
 	const [activities, setActivities] = useState([])
 	const [refreshing, setRefreshing] = useState(false)
 
 	const auth = useAuth()
-
-	const tabs = [
-		{ label: "scheduled", labelValue: 1 },
-		{ label: "completed", labelValue: 0 },
-	]
 
 	const renderGreeting = () => {
 		const now = new Date()
@@ -69,7 +70,9 @@ const Home = ({ navigation }: Props) => {
 		api.maintenance
 			.getByTechnicianId(userData?.id)
 			.then((response) => {
-				setActivities(response.data)
+				if (response.status === 200) {
+					setActivities(response.data)
+				}
 			})
 			.finally(() => {
 				setRefreshing(false)
@@ -108,28 +111,28 @@ const Home = ({ navigation }: Props) => {
 				<Tab
 					style={{ marginTop: 20 }}
 					tabs={tabs}
-					active={tab}
-					onPress={(value) => setTab(value)}
+					active={tab.labelValue}
+					onPress={(value) => {
+						setTab(value)
+					}}
 				/>
 			</View>
 
-			{tab === "scheduled" && (
-				<FlatList
-					refreshing={refreshing}
-					onRefresh={handleFetchActivities}
-					data={activities}
-					contentContainerStyle={{ paddingVertical: 20 }}
-					keyExtractor={(item) => JSON.stringify(item)}
-					renderItem={({ item }) => {
-						return (
-							<TaskCard
-								task={item}
-								onPress={() => navigation.navigate("TaskDetail", { task: item })}
-							/>
-						)
-					}}
-				/>
-			)}
+			<FlatList
+				refreshing={refreshing}
+				onRefresh={handleFetchActivities}
+				data={activities.filter((activities: any) => activities.status === tab.labelValue)}
+				contentContainerStyle={{ paddingVertical: 20 }}
+				keyExtractor={(item) => JSON.stringify(item)}
+				renderItem={({ item }) => {
+					return (
+						<TaskCard
+							task={item}
+							onPress={() => navigation.navigate("TaskDetail", { task: item })}
+						/>
+					)
+				}}
+			/>
 		</Screen>
 	)
 }

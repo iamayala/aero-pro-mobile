@@ -8,7 +8,7 @@ type Props = {
 	placeholder: string
 	value: string
 	onChangeText: (value: string) => void
-	type: "EMAIL" | "PASSWORD"
+	type?: "EMAIL" | "PASSWORD" | "SEARCH"
 }
 
 const TextField = ({ label, error, placeholder, type, value, onChangeText }: Props) => {
@@ -16,7 +16,7 @@ const TextField = ({ label, error, placeholder, type, value, onChangeText }: Pro
 
 	return (
 		<View style={{ marginVertical: 5 }}>
-			<Text style={{ color: "#FFFFFF", fontSize: 15 }}>{label}</Text>
+			{label && <Text style={{ color: "#FFFFFF", fontSize: 15 }}>{label}</Text>}
 			<View
 				style={{
 					marginTop: 10,
@@ -31,11 +31,17 @@ const TextField = ({ label, error, placeholder, type, value, onChangeText }: Pro
 			>
 				{type === "EMAIL" && <Feather name="mail" size={24} color="#647187" />}
 				{type === "PASSWORD" && <Feather name="lock" size={24} color="#647187" />}
+				{type === "SEARCH" && <Feather name="search" size={24} color="#647187" />}
 				<TextInput
 					value={value}
 					placeholder={placeholder}
 					secureTextEntry={type === "PASSWORD" && !showPwd}
-					style={{ flex: 1, marginLeft: 15, color: "#FFFFFF", fontSize: 18 }}
+					style={{
+						flex: 1,
+						marginLeft: 15,
+						color: "#FFFFFF",
+						fontSize: 18,
+					}}
 					onChangeText={onChangeText}
 					placeholderTextColor="#647187"
 				/>
