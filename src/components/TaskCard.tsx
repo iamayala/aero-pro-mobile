@@ -15,6 +15,12 @@ const TaskCard = ({ task, onPress }: Props) => {
 			onPress={onPress}
 			style={{ backgroundColor: "#FDF684", padding: 15, borderRadius: 25, marginBottom: 15 }}
 		>
+			<View style={{ marginBottom: 20 }}>
+				<Text style={{ fontSize: 18, marginRight: 10 }}>
+					{moment(task.start_datetime).format("dddd, MMM D YYYY h:mm A")}
+				</Text>
+				<Text style={{ fontSize: 35, marginTop: 5 }}>{task.activity_description}</Text>
+			</View>
 			<View
 				style={{
 					flexDirection: "row",
@@ -23,14 +29,6 @@ const TaskCard = ({ task, onPress }: Props) => {
 				}}
 			>
 				<Tag label={task.activity_type} />
-				<IconButton icon="more-horizontal" onPress={() => {}} type="light" />
-			</View>
-
-			<View style={{ marginTop: 10 }}>
-				<Text style={{ fontSize: 18, marginRight: 10 }}>
-					{moment(task.start_datetime).format("dddd, MMM D YYYY h:mm A")}
-				</Text>
-				<Text style={{ fontSize: 35, marginTop: 5 }}>{task.activity_description}</Text>
 			</View>
 		</TouchableOpacity>
 	)

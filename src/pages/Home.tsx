@@ -1,10 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { StatusBar } from "expo-status-bar"
 import moment from "moment"
 import { useEffect, useState } from "react"
-import { FlatList, StyleSheet, View } from "react-native"
-import api from "../api"
+import { FlatList, View } from "react-native"
+import { useDispatch, useSelector } from "react-redux"
 import Header from "../components/Header"
 import IconButton from "../components/IconButton"
 import InfoItem from "../components/InfoItem"
@@ -13,6 +11,8 @@ import Tab from "../components/Tab"
 import TaskCard from "../components/TaskCard"
 import { useAuth } from "../hooks/use-auth"
 import { RootStackParamList } from "../navigation"
+import { AppDispatch, RootState } from "../store"
+import { Task } from "../store/models/Task"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">
 
@@ -23,12 +23,13 @@ const tabs = [
 ]
 
 const Home = ({ navigation }: Props) => {
+	const { user } = useSelector((state: RootState) => state.account)
+	const { tasks } = useSelector((state: RootState) => state.task)
+
 	const [tab, setTab] = useState(tabs[0])
-	const [userData, setUserData] = useState<any>(null)
-	const [activities, setActivities] = useState([])
-	const [refreshing, setRefreshing] = useState(false)
 
 	const auth = useAuth()
+	const dispatch = useDispatch<AppDispatch>()
 
 	const renderGreeting = () => {
 		const now = new Date()
@@ -44,40 +45,12 @@ const Home = ({ navigation }: Props) => {
 	}
 
 	const handleLogout = () => {
-		auth.logout()
+		dispatch.account.logOut()
 	}
 
 	useEffect(() => {
-		getUserData()
+		dispatch.task.fetchTasks(user?.id ?? 0)
 	}, [])
-
-	const getUserData = async () => {
-		try {
-			const userData = await AsyncStorage.getItem("cookieman")
-			setUserData(userData ? JSON.parse(userData) : null)
-		} catch (e) {
-			console.error("Error parsing JSON", e)
-			return null
-		}
-	}
-
-	useEffect(() => {
-		handleFetchActivities()
-	}, [])
-
-	const handleFetchActivities = () => {
-		setRefreshing(true)
-		api.maintenance
-			.getByTechnicianId(userData?.id)
-			.then((response) => {
-				if (response.status === 200) {
-					setActivities(response.data)
-				}
-			})
-			.finally(() => {
-				setRefreshing(false)
-			})
-	}
 
 	return (
 		<Screen color="#121C2D" style={{ paddingHorizontal: 25 }}>
@@ -119,12 +92,11 @@ const Home = ({ navigation }: Props) => {
 			</View>
 
 			<FlatList
-				refreshing={refreshing}
-				onRefresh={handleFetchActivities}
-				data={activities.filter((activities: any) => activities.status === tab.labelValue)}
+				showsVerticalScrollIndicator={false}
+				data={tasks.filter((activities: any) => activities.status === tab.labelValue)}
 				contentContainerStyle={{ paddingVertical: 20 }}
 				keyExtractor={(item) => JSON.stringify(item)}
-				renderItem={({ item }) => {
+				renderItem={({ item }: { item: Task }) => {
 					return (
 						<TaskCard
 							task={item}

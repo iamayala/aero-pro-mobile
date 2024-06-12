@@ -1,12 +1,14 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React, { useCallback, useEffect, useState } from "react"
 import { FlatList, ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { useDispatch, useSelector } from "react-redux"
 import api from "../api"
 import Button from "../components/Button"
 import IconButton from "../components/IconButton"
 import Screen from "../components/Screen"
 import TextField from "../components/TextField"
 import { RootStackParamList } from "../navigation"
+import { AppDispatch, RootState } from "../store"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Checkout">
 
@@ -18,6 +20,9 @@ const Checkout = ({ navigation, route }: Props) => {
 	const [query, setQuery] = useState("")
 	const [comment, setComment] = useState("")
 	const [toolUsed, setToolUsed] = useState([])
+
+	const { user } = useSelector((state: RootState) => state.account)
+	const dispatch = useDispatch<AppDispatch>()
 
 	const getAllParts = () => {
 		api.part.get().then((response) => {
@@ -78,6 +83,7 @@ const Checkout = ({ navigation, route }: Props) => {
 			.put(payload, task.id)
 			.then((response) => {
 				if (response.status === 200) {
+					dispatch.task.fetchTasks(user?.id ?? 0)
 					navigation.navigate("Home")
 				}
 			})

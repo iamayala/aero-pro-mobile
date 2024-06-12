@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import moment from "moment"
 import React from "react"
 import { View } from "react-native"
+import { useDispatch, useSelector } from "react-redux"
 import api from "../api"
 import Button from "../components/Button"
 import Header from "../components/Header"
@@ -10,11 +11,14 @@ import InfoHolder from "../components/InfoHolder"
 import Screen from "../components/Screen"
 import Tag from "../components/Tag"
 import { RootStackParamList } from "../navigation"
+import { AppDispatch, RootState } from "../store"
 
 type Props = NativeStackScreenProps<RootStackParamList, "TaskDetail">
 
 const TaskDetail = ({ navigation, route }: Props) => {
 	const { task } = route.params
+	const { user } = useSelector((state: RootState) => state.account)
+	const dispatch = useDispatch<AppDispatch>()
 
 	const updateTask = () => {
 		const payload = {
@@ -26,6 +30,7 @@ const TaskDetail = ({ navigation, route }: Props) => {
 			.put(payload, task.id)
 			.then((response) => {
 				if (response.status === 200) {
+					dispatch.task.fetchTasks(user?.id ?? 0)
 					navigation.navigate("Home")
 				}
 			})

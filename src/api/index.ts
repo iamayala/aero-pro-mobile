@@ -1,6 +1,7 @@
 import axios from "axios"
+import { Task } from "../store/models/Task"
 
-export const API_BASE_URL = "http://192.168.0.106:8080" // Adjust the base URL as needed
+export const API_BASE_URL = "http://192.168.0.112:8080" // Adjust the base URL as needed
 
 const api = {
 	auth: {
@@ -41,20 +42,7 @@ const api = {
 	maintenance: {
 		getByTechnicianId: (id: number) =>
 			axios.get(`${API_BASE_URL}/maintenance/technician/${id}`),
-		put: (
-			payload: {
-				activity_type: string
-				activity_description: string
-				aircraft_id: number
-				technician_id: any
-				start_datetime: string
-				end_datetime: string
-				parts_replaced: any[]
-				issues_resolved: string
-				status: string
-			},
-			id: number
-		) => axios.put(`${API_BASE_URL}/maintenance/${id}`, payload),
+		put: (payload: Task, id: number) => axios.put(`${API_BASE_URL}/maintenance/${id}`, payload),
 	},
 
 	part: {

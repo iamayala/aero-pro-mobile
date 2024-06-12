@@ -2,11 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React, { useEffect, useState } from "react"
 import { ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { useSelector } from "react-redux"
 import IconButton from "../components/IconButton"
 import Screen from "../components/Screen"
 import Tag from "../components/Tag"
 import { useAuth } from "../hooks/use-auth"
 import { RootStackParamList } from "../navigation"
+import { RootState } from "../store"
 
 type ProfileComponent = {
 	icon:
@@ -221,21 +223,7 @@ type ProfileComponent = {
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">
 
 const Profile = ({ navigation }: Props) => {
-	const [userData, setUserData] = useState<any>(null)
-
-	useEffect(() => {
-		getUserData()
-	}, [])
-
-	const getUserData = async () => {
-		try {
-			const userData = await AsyncStorage.getItem("cookieman")
-			setUserData(userData ? JSON.parse(userData) : null)
-		} catch (e) {
-			console.error("Error parsing JSON", e)
-			return null
-		}
-	}
+	const { user } = useSelector((state: RootState) => state.account)
 
 	const ProfileComponent = ({ icon, subTitle, title }: ProfileComponent) => {
 		return (
@@ -265,8 +253,8 @@ const Profile = ({ navigation }: Props) => {
 							marginVertical: 15,
 						}}
 					/>
-					<Text style={{ fontSize: 25 }}>{userData?.full_name}</Text>
-					<Text style={{ fontSize: 18, marginTop: 5 }}>{userData?.email}</Text>
+					<Text style={{ fontSize: 25 }}>{user?.full_name}</Text>
+					<Text style={{ fontSize: 18, marginTop: 5 }}>{user?.email}</Text>
 					<View
 						style={{
 							flexDirection: "row",
@@ -275,21 +263,15 @@ const Profile = ({ navigation }: Props) => {
 							justifyContent: "center",
 						}}
 					>
-						<Tag label={userData?.role} />
+						<Tag label={user?.role ?? ""} />
 					</View>
 				</View>
 
 				<View style={{ marginTop: 20 }}>
 					<ProfileComponent
-						subTitle="Make changes to your profile inbformation"
+						subTitle="Make changes to your profile information"
 						title="Edit Profile"
 						icon="edit-2"
-					/>
-					<ProfileComponent subTitle="Change your pin" title="Security" icon="lock" />
-					<ProfileComponent
-						subTitle="Setup notification preference"
-						title="Notifications"
-						icon="bell"
 					/>
 					<ProfileComponent
 						subTitle="Call the service center to get help"

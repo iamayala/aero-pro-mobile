@@ -1,33 +1,15 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React, { useState } from "react"
 import { View } from "react-native"
-import api, { API_BASE_URL } from "../api"
+import { useDispatch } from "react-redux"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import Screen from "../components/Screen"
 import Snackbar from "../components/Snackbar"
 import TextField from "../components/TextField"
-import { useAuth } from "../hooks/use-auth"
-import { RootStackParamList } from "../navigation"
+import { AppDispatch } from "../store"
 
-type Props = NativeStackScreenProps<RootStackParamList, "Login">
-
-type LoginPayload = {
-	email: string
-	password: string
-}
-
-type LoginResponse = {
-	token: string
-	user: {
-		id: string
-		email: string
-		name: string
-		// Add any other fields you expect in the response
-	}
-}
-
-const Login = ({ navigation }: Props) => {
+const Login = () => {
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
 	const [errorMessage, setErrorMessage] = useState("")
@@ -37,7 +19,7 @@ const Login = ({ navigation }: Props) => {
 		password: "",
 	})
 
-	const auth = useAuth()
+	const dispatch = useDispatch<AppDispatch>()
 
 	const validateForm = () => {
 		const newErrors: any = {}
@@ -56,19 +38,13 @@ const Login = ({ navigation }: Props) => {
 	}
 
 	const handleLogin = (data: { password: string; email: string }) => {
-		api.auth
-			.login({
-				email: data.email,
-				password: data.password,
+		dispatch.account
+			.authenticate(data)
+			.then(() => {
+				setUsername("")
+				setPassword("")
 			})
-			.then((response) => {
-				auth.saveUserToLocalStorage(response.data.user).then(() => {
-					setUsername("")
-					setPassword("")
-					navigation.navigate("Home")
-				})
-			})
-			.catch((error) => {
+			.catch((error: { message: React.SetStateAction<string> }) => {
 				setErrorMessage(error.message)
 			})
 	}
